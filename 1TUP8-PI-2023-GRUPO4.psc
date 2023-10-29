@@ -8,10 +8,10 @@ Algoritmo trabajoPractico
 	Repetir
 		Escribir "Ingrese la cantidad de articulos que posee la ferreteria: ";
 		Leer cantidadArticulos;
-		si cantidadArticulos < 0 Entonces
+		si cantidadArticulos <= 0 Entonces
 			Escribir "Cantidad de articulos incorrecta";
 		FinSi
-	Mientras Que cantidadArticulos < 0
+	Mientras Que cantidadArticulos <= 0
 
 	//defino las dimensiones del arreglo
 	//invocamos un subproceso para cargar los articulos
