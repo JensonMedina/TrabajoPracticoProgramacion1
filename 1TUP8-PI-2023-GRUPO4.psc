@@ -242,10 +242,9 @@ funcion codigoValido <- validarCodigo (codigo)
 	letras=Falso;
 	//primero que todo verifico que la longitud del codigo sea exactamente 8
 	si Longitud(codigo) == 8 Entonces
-		//Asi extraigo los primeros tres digitos y los guardo en rubro
 		Para i=0 hasta Longitud(codigo)-1 Hacer
-			digito=Subcadena(codigo,i,i);
-			si digito < "0" o digito > "9" Entonces
+			digito=Subcadena(codigo,i,i);//Extraemos letra por letra y la asignamos a digito
+			si digito < "0" o digito > "9" Entonces //comparamos para validar que la letra no sea menor que cero o mayor que 9
 				i=longitud(codigo); // para salir del para si ya encontramos al menos una letra en el codigo
 				letras=Verdadero; // Letra encontrada entonces Verdadero
 				Escribir "El codigo no puede contener letras/caracteres especiales";
@@ -287,7 +286,7 @@ SubProceso ordenarDescripcion(arregloArticulos,fila,columnas)
 	Para i=0 hasta fila-2 Hacer
 		posMenor=i;
 		para j=i+1 hasta fila-1 Hacer
-			si Minusculas(arregloArticulos[j,1])<Minusculas(arregloArticulos[posMenor,1]) Entonces
+			si Minusculas(arregloArticulos[j,1])<Minusculas(arregloArticulos[posMenor,1]) Entonces //convertimos ambas descripciones a minusculas para que no haya ningun problema al momento de comparar
 				posMenor=j;
 			FinSi
 		FinPara
@@ -326,8 +325,8 @@ SubProceso ordenarCantVendida(arregloArticulos,fila,columnas)
 		posMenor = i;
 		para j=i+1 hasta fila-1 Hacer
 			suma1 = sumaQuincenas(arregloArticulos, posMenor); //sumaQuincenas nos devuelve el valor de la suma de las ventas del mes de las quincenas de dicho articulo (segun la fila que le pasamos como parametro)
-			suma2 = sumaQuincenas(arregloArticulos, j);
-			si suma1<suma2
+			suma2 = sumaQuincenas(arregloArticulos, j); //suma 2 es nuestro pivote
+			si suma1<suma2 //comparamos si el valor de la posicion menor es menor que el pivote, si es asi entonces guardamos en posMenor el valor que tiene j en ese momento
 				posMenor=j;
 			FinSi
 		FinPara
@@ -339,7 +338,7 @@ SubProceso ordenarCantVendida(arregloArticulos,fila,columnas)
 	FinPara
 FinSubProceso
 
-//En este subproces devolvemos la lista de los articulos ordenada por cantidad vendida de mayor a menor:
+//En este subproceso devolvemos la lista de los articulos ordenada por cantidad vendida de mayor a menor:
 SubProceso imprimirListaOrdenCantArt(arregloArticulos,fila,columnas,arregloTitulosArticulos)
 	definir acumuladorVentasTotal Como Real;
 	acumuladorVentasTotal = 0;
@@ -368,7 +367,7 @@ SubProceso stockActual(arregloArticulos,fila,columnas)
 	definir stock como entero;
 	para i=0 hasta fila-1 Hacer
 		para j=0 hasta columnas-1 Hacer
-			stock=ConvertirANumero(arregloArticulos[i,3]) - sumaQuincenas(arregloArticulos, i);
+			stock=ConvertirANumero(arregloArticulos[i,3]) - sumaQuincenas(arregloArticulos, i); //stock actual = stock original - vendido
 		FinPara
 		Escribir Sin Saltar arregloArticulos[i,0]," ",arregloArticulos[i,1]," ","->STOCK ACTUAL: ",stock;
 		Escribir " ";
@@ -403,8 +402,8 @@ SubProceso buscarCodigo(arregloArticulos,fila,columnas)
 	
 	//si el codigo existe realizamos los calculos y mostramos el articulo
 	si banEncontrado Entonces
-		stock = ConvertirANumero(arregloArticulos[posEncontrado,3]) - sumaQuincenas(arregloArticulos, posEncontrado);
-		importeTotal = sumaQuincenas(arregloArticulos, posEncontrado) *ConvertirANumero(arregloArticulos[posEncontrado,2]);
+		stock = ConvertirANumero(arregloArticulos[posEncontrado,3]) - sumaQuincenas(arregloArticulos, posEncontrado); //Calculamos el stock actual del articulo encontrado
+		importeTotal = sumaQuincenas(arregloArticulos, posEncontrado) *ConvertirANumero(arregloArticulos[posEncontrado,2]); //calculamos el valor en dinero de lo que se vendio de ese articulo
 		Escribir "Codigo: ",arregloArticulos[posEncontrado,0]," ";
 		Escribir "Quincena 1: " ,arregloArticulos[posEncontrado, 4];
 		Escribir "Quincena 2: " ,arregloArticulos[posEncontrado, 5];
@@ -428,7 +427,7 @@ SubProceso estadisticas(arregloArticulos,fila,columnas,vectorRubros)
 	vectorRubros[3] = "Pinturas";
 	vectorRubros[4] = "Electricidad";
 	
-	// en vector contador rubros vamos a cargar los contadores de los rubros
+	// en vector acumulador rubros vamos a cargar los acumuladores de los rubros
 	definir vectorAcumuladorRubros Como Entero;
 	Dimension vectorAcumuladorRubros[5];
 	
@@ -447,30 +446,29 @@ SubProceso estadisticas(arregloArticulos,fila,columnas,vectorRubros)
 	//posicion 3 para el rubro 680: Pinturas
 	//posicion 4 para el rubro 720: Electricidad
 	
-	//con un para inicializamos los contadores en 0
-	para i = 0 hasta 4 con paso 1 Hacer // Hasta 4 porque son 5 rubros nada mas
+	//con un para inicializamos los acumuladores en 0
+	para i = 0 hasta 4 con paso 1 Hacer
 		vectorAcumuladorRubros[i] = 0; 
 	FinPara
 	
-	//con este para extraemos el rubro y los vamos cargando en el vector contador rubros
+	//con este para extraemos el rubro y los vamos cargando en el vector acumulador rubros
 	Para i=0 hasta fila-1 Hacer
 		rubro = ObtenerRubro(arregloArticulos[i,0]); //La funcion ObtenerRubro nos devuelve los 3 primeros digitos, es decir el rubro, del codigo de dicho articulo
 		Segun rubro Hacer
 			100:
-				//si el rubro es 100 aumentamos en uno el contador del rubro tornillos y tuercas
+				//si el rubro es 100 vamos acumulando lo que tenia el vectorAcumuladorRubros mas lo que devuelve la suma de quincenas
 				vectorAcumuladorRubros[0] = vectorAcumuladorRubros[0] +sumaQuincenas(arregloArticulos, i);
 			300:
-				//si el rubro es 300 aumentamos en uno el contador de adhesivos
-				
+				//si el rubro es 300 vamos acumulando lo que tenia el vectorAcumuladorRubros mas lo que devuelve la suma de quincenas
 				vectorAcumuladorRubros[1] = vectorAcumuladorRubros[1] +sumaQuincenas(arregloArticulos, i);
 			450:
-				//si el rubro es 450 aumentamos en uno el contador de herrajes
+				//si el rubro es 450 vamos acumulando lo que tenia el vectorAcumuladorRubros mas lo que devuelve la suma de quincenas
 				vectorAcumuladorRubros[2] = vectorAcumuladorRubros[2] +sumaQuincenas(arregloArticulos, i);
 			680:
-				//si el rubro es 680 aumentamos en uno el contador de pinturas
+				//si el rubro es 680 vamos acumulando lo que tenia el vectorAcumuladorRubros mas lo que devuelve la suma de quincenas
 				vectorAcumuladorRubros[3] = vectorAcumuladorRubros[3] +sumaQuincenas(arregloArticulos, i);
 			De Otro Modo:
-				// si el rubro es 720 aumentamos en uno el contador de electricidad
+				//si el rubro es 720 vamos acumulando lo que tenia el vectorAcumuladorRubros mas lo que devuelve la suma de quincenas
 				vectorAcumuladorRubros[4] = vectorAcumuladorRubros[4] +sumaQuincenas(arregloArticulos, i);
 		Fin Segun
 	FinPara
@@ -480,7 +478,7 @@ SubProceso estadisticas(arregloArticulos,fila,columnas,vectorRubros)
 		vectorPorcentajesRubros[i] = (vectorAcumuladorRubros[i] * 100) / sumaCantidadDeVentas(arregloArticulos, fila); 
 	FinPara
 	
-	//con este para mostramos los porcentajes:
+	//con este para mostramos los porcentajes redondeados:
 	para i = 0 hasta 4 con paso 1 Hacer
 		Escribir "El porcentaje del rubro " ,vectorRubros[i], " es: " ,redon(vectorPorcentajesRubros[i]), "%";
 	FinPara
@@ -489,9 +487,11 @@ FinSubProceso
 //la función "sumaCantidadDeVentas" recorre todas las filas del arreglo de artículos, suma las cantidades de ventas de cada artículo y 
 //devuelve el resultado como la suma total de las cantidades de ventas de todos los artículos en la ferretería.
 Funcion resultadoSumaCantidadDeVentas <- sumaCantidadDeVentas(arregloArticulos, fila)
+	//en la variable acumulador cantidad de ventas vamos a ir acumulando las ventas que se hicieron
 	Definir acumuladorCantidadVentas Como Entero;
 	acumuladorCantidadVentas = 0;
 	Para i = 0 Hasta fila - 1 Hacer
+		//recorremos todas las filas del arreglo de articulos, vamos sumando lo vendido en las quincenas y lo vamos acumulando
 		acumuladorCantidadVentas = acumuladorCantidadVentas + sumaQuincenas(arregloArticulos, i);
 	FinPara
 	resultadoSumaCantidadDeVentas = acumuladorCantidadVentas;
